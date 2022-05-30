@@ -1,39 +1,80 @@
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using testApi.model;
 
-namespace awsTest.Controllers;
-
-[Route("api/[controller]")]
-public class ValuesController : ControllerBase
+namespace testApi.Controllers
 {
-    // GET api/values
-    [HttpGet]
-    public IEnumerable<string> Get()
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ValuesController : ControllerBase
     {
-        return new string[] { "value1", "value2" };
-    }
+        private static List<User> users = new List<User>
+        {
+            new User
+            {
+                   Id = "1", Name = "Kalpa", Age = 20, MobileNumber = "0712115457",  Gender = "Male"
+            },
+            new User
+            {
+                   Id = "2", Name = "Hirusha", Age = 25, MobileNumber = "0725489201",  Gender = "Male"
+            },
+            new User
+            {
+                   Id = "3", Name = "Gayani", Age = 30, MobileNumber = "0758941236",  Gender = "Female"
+            },
+        };
 
-    // GET api/values/5
-    [HttpGet("{id}")]
-    public string Get(int id)
-    {
-        return "value";
-    }
+        [HttpGet("User")]
+        public async Task<ActionResult<List<User>>> GetUser()
+        {
+            return Ok(users);
+        }
 
-    // POST api/values
-    [HttpPost]
-    public void Post([FromBody]string value)
-    {
-    }
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult<User>> GetUser(string id)
+        {
+            var user = users.Find(u => u.Id == id);
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+            return Ok(user);
+        }
 
-    // PUT api/values/5
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody]string value)
-    {
-    }
+        [HttpPost("AddUser")]
+        public async Task<ActionResult<List<User>>> AddUser(User user)
+        {
+            users.Add(user);
+            return Ok(users);
+        }
 
-    // DELETE api/values/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
-    {
+        [HttpPut("UpdateUser")]
+        public async Task<ActionResult<List<User>>> UpdateUser(User request)
+        {
+            var user = users.Find(u => u.Id == request.Id);
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+
+            user.Name = request.Name;
+            user.Age = request.Age;
+            user.MobileNumber = request.MobileNumber;
+            user.Gender = request.Gender;
+
+            return Ok(users);
+        }
+
+        [HttpDelete("User/{id}")]
+        public async Task<ActionResult<List<User>>> DeleteUser(string id)
+        {
+            var user = users.Find(u => u.Id == id);
+            if (user == null)
+            {
+                return BadRequest("User not found.");
+            }
+            users.Remove(user);
+            return Ok(users);
+        }
     }
 }

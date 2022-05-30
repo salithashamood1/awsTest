@@ -5,6 +5,9 @@ using testApi.Services;
 
 namespace awsTest;
 
+
+
+
 public class Startup
 {
     public Startup(IConfiguration configuration)
@@ -17,10 +20,11 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container
     public void ConfigureServices(IServiceCollection services)
     {
-        //services.Configure<UserStoreDatabaseSettings>(Configuration);
-        //services.AddSingleton<IUserStoreDatabaseSettings>(sp => sp.GetRequiredService<IOptions<UserStoreDatabaseSettings>>().Value);
-        //services.AddSingleton<IMongoClient>(s => new MongoClient(builder.Configuration.GetValue<string>("UserStoreDatabaseSettings:ConnectionString")));
-        //services.AddScoped<IUserService, UserService>();
+        services.Configure<UserStoreDatabaseSettings>(Configuration.GetSection(nameof(UserStoreDatabaseSettings)));
+        services.AddSingleton<IUserStoreDatabaseSettings>(sp => sp.GetRequiredService<IOptions<UserStoreDatabaseSettings>>().Value);
+        services.AddSingleton<IMongoClient>(s => new MongoClient(Configuration.GetValue<string>("UserStoreDatabaseSettings:ConnectionString")));
+        services.AddScoped<IUserService, UserService>();
+
         services.AddControllers();
         services.AddSwaggerGen();
     }
